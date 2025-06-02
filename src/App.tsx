@@ -95,9 +95,9 @@ function App() {
                 </div>
               </div>
 
-              {analysis && (
+              {analysis && seoData && (
                 <div className="w-full mt-6">
-                  <SEOAnalysis analysis={analysis} />
+                  <SEOAnalysis analysis={analysis} rawData={seoData} />
                 </div>
               )}
             </div>
