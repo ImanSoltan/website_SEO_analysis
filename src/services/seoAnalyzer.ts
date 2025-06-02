@@ -3,53 +3,74 @@ import type { SEOData, SEOAnalysis, SEOIssue } from '../types/seo';
 
 export async function fetchWebsiteData(url: string): Promise<SEOData> {
   try {
-    // Using cors.sh as a more reliable CORS proxy
-    const corsProxy = 'https://cors.sh/';
-    const response = await axios.get(`${corsProxy}${url}`, {
-      headers: {
-        'x-cors-api-key': 'temp_f0e6a1fcacf0b73ab3c81a36d63d3915', // Free tier API key
-        'x-requested-with': 'XMLHttpRequest'
+    // Using cors-anywhere as a fallback proxy
+    const corsProxies = [
+      'https://api.allorigins.win/raw?url=',
+      'https://cors-anywhere.herokuapp.com/',
+      'https://api.codetabs.com/v1/proxy?quest='
+    ];
+
+    let lastError;
+    for (const proxy of corsProxies) {
+      try {
+        const response = await axios.get(`${proxy}${encodeURIComponent(url)}`, {
+          timeout: 15000, // 15 second timeout
+          headers: {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Origin': window.location.origin
+          }
+        });
+        
+        const html = response.data;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const seoData: SEOData = {
+          title: getMetaContent(doc, 'title') || doc.title || '',
+          description: getMetaContent(doc, 'description'),
+          keywords: getMetaContent(doc, 'keywords').split(',').map(k => k.trim()).filter(Boolean),
+          ogTitle: getMetaContent(doc, 'og:title'),
+          ogDescription: getMetaContent(doc, 'og:description'),
+          ogImage: getMetaContent(doc, 'og:image'),
+          twitterCard: getMetaContent(doc, 'twitter:card'),
+          twitterTitle: getMetaContent(doc, 'twitter:title'),
+          twitterDescription: getMetaContent(doc, 'twitter:description'),
+          twitterImage: getMetaContent(doc, 'twitter:image'),
+          canonical: getCanonicalUrl(doc),
+          robots: getMetaContent(doc, 'robots'),
+          viewport: getMetaContent(doc, 'viewport'),
+          charset: getCharset(doc),
+          language: getLanguage(doc),
+          author: getMetaContent(doc, 'author'),
+          favicon: getFavicon(doc, url),
+        };
+
+        return seoData;
+      } catch (error) {
+        lastError = error;
+        continue; // Try next proxy
       }
-    });
-    
-    const html = response.data;
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
+    }
 
-    const seoData: SEOData = {
-      title: getMetaContent(doc, 'title') || doc.title || '',
-      description: getMetaContent(doc, 'description'),
-      keywords: getMetaContent(doc, 'keywords').split(',').map(k => k.trim()).filter(Boolean),
-      ogTitle: getMetaContent(doc, 'og:title'),
-      ogDescription: getMetaContent(doc, 'og:description'),
-      ogImage: getMetaContent(doc, 'og:image'),
-      twitterCard: getMetaContent(doc, 'twitter:card'),
-      twitterTitle: getMetaContent(doc, 'twitter:title'),
-      twitterDescription: getMetaContent(doc, 'twitter:description'),
-      twitterImage: getMetaContent(doc, 'twitter:image'),
-      canonical: getCanonicalUrl(doc),
-      robots: getMetaContent(doc, 'robots'),
-      viewport: getMetaContent(doc, 'viewport'),
-      charset: getCharset(doc),
-      language: getLanguage(doc),
-      author: getMetaContent(doc, 'author'),
-      favicon: getFavicon(doc, url),
-    };
-
-    return seoData;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 429) {
-        throw new Error('Rate limit exceeded. Please try again in a few minutes.');
-      } else if (error.response?.status === 403) {
+    // If we get here, all proxies failed
+    if (axios.isAxiosError(lastError)) {
+      if (lastError.response?.status === 429) {
+        throw new Error('All CORS proxies are rate limited. Please try again in a few minutes.');
+      } else if (lastError.response?.status === 403) {
         throw new Error('Access to this website is forbidden. Please try another URL.');
-      } else if (error.response?.status === 404) {
+      } else if (lastError.response?.status === 404) {
         throw new Error('Website not found. Please check the URL and try again.');
-      } else if (!error.response) {
+      } else if (!lastError.response) {
         throw new Error('Network error. Please check your internet connection and try again.');
       }
     }
-    throw new Error('Failed to analyze the website. Please try again.');
+    throw new Error('Failed to analyze the website. All CORS proxies failed. Please try again later.');
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('An unexpected error occurred while analyzing the website.');
   }
 }
 
