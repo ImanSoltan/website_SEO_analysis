@@ -45,7 +45,7 @@ These instructions will get you a copy of the project up and running on your loc
 1.  **Clone the repository:**
     ```bash
     git clone <your-repository-url>
-    cd website-seo-analysis-cursor
+    cd website-seo-analysis
     ```
 
 2.  **Install dependencies:**
