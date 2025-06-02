@@ -1,54 +1,93 @@
-# React + TypeScript + Vite
+# Website SEO Analyzer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A web application designed to analyze the SEO health of any given website. It fetches website data, identifies common SEO issues, provides recommendations for improvement, and displays social media previews.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+*   **SEO Score:** Get an overall SEO score based on various checks.
+*   **Issue Detection:** Identifies common SEO problems such as:
+    *   Missing or poorly optimized title tags
+    *   Missing or poorly optimized meta descriptions
+    *   Missing or incomplete Open Graph (Facebook, LinkedIn, etc.) meta tags
+    *   Missing or incomplete Twitter Card meta tags
+    *   Other common on-page SEO elements (keywords, canonical, robots, viewport, etc.)
+*   **Recommendations:** Provides actionable advice to fix identified issues.
+*   **Social Previews:** Shows how the website might appear when shared on:
+    *   Google Search
+    *   Facebook
+    *   Twitter
+*   **Responsive Design:** User-friendly interface that works on various screen sizes.
+*   **Real-time Analysis:** Fetches and analyzes live website data.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+*   **Frontend:**
+    *   [React](https://reactjs.org/) (with Vite)
+    *   [TypeScript](https://www.typescriptlang.org/)
+    *   [Tailwind CSS](https://tailwindcss.com/)
+    *   [React Icons](https://react-icons.github.io/react-icons/)
+*   **HTTP Client:**
+    *   [Axios](https://axios-http.com/)
+*   **CORS Proxy:**
+    *   Uses various public CORS proxies (e.g., allorigins.win, cors-anywhere) to fetch data from external websites.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Getting Started
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Prerequisites
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+*   Node.js (v18.x or later recommended)
+*   npm (usually comes with Node.js) or yarn
+
+### Installation & Setup
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <your-repository-url>
+    cd website-seo-analysis-cursor
+    ```
+
+2.  **Install dependencies:**
+    Using npm:
+    ```bash
+    npm install --legacy-peer-deps
+    ```
+    Or using yarn:
+    ```bash
+    yarn install --legacy-peer-deps 
+    ```
+    *(The `--legacy-peer-deps` flag might be needed due to some current dependency versioning in the project, as seen during setup.)*
+
+3.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+    Or using yarn:
+    ```bash
+    yarn dev
+    ```
+    The application should now be running on `http://localhost:5173` (or the next available port).
+
+## How to Use
+
+1.  Open the application in your browser.
+2.  Enter the full URL of the website you want to analyze (e.g., `https://example.com`) into the input field.
+3.  Click the "Analyze" button.
+4.  Review the SEO Health score, Key Insights, Issues to Address, and Recommendations provided.
+5.  Check the Google, Facebook, and Twitter previews to see how the site might appear when shared.
+
+## Screenshots
+
+*(Consider adding a few screenshots of the application here once you're happy with the UI)*
+
+*   *Main Analyzer Interface*
+*   *Example of SEO Score and Issues*
+*   *Example of Social Previews*
+
+## Future Enhancements (Optional)
+
+*   More detailed analysis for specific elements (e.g., heading structure, image alt tags).
+*   Performance metrics (e.g., Lighthouse score integration).
+*   Historical analysis and tracking.
+*   User accounts and saved reports.
