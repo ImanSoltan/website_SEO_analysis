@@ -77,20 +77,6 @@ These instructions will get you a copy of the project up and running on your loc
 4.  Review the SEO Health score, Key Insights, Issues to Address, and Recommendations provided.
 5.  Check the Google, Facebook, and Twitter previews to see how the site might appear when shared.
 
-## Screenshots
-
-*(Consider adding a few screenshots of the application here once you're happy with the UI)*
-
-*   *Main Analyzer Interface*
-*   *Example of SEO Score and Issues*
-*   *Example of Social Previews*
-
-## Future Enhancements (Optional)
-
-*   More detailed analysis for specific elements (e.g., heading structure, image alt tags).
-*   Performance metrics (e.g., Lighthouse score integration).
-*   Historical analysis and tracking.
-*   User accounts and saved reports.
 
 MIT License
 
