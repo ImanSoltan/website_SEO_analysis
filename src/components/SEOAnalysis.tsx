@@ -9,6 +9,8 @@ import {
   FaGoogle, // For SEO
   FaShareSquare, // For SMO
   FaClipboardCheck, // Replaced FaListCheck
+  FaLightbulb, // For recommendations title
+  FaBug, // For issues title
 } from 'react-icons/fa';
 
 interface Props {
@@ -86,6 +88,12 @@ export function SEOAnalysis({ analysis, rawData }: Props) {
     }
   };
 
+  const getOverallScoreDescription = (score: number) => {
+    if (score >= 90) return "Your website's SEO is in excellent shape! Great job!";
+    if (score >= 70) return "Your SEO is good, but a few tweaks could make it even better.";
+    return "There are several areas to improve for better search engine visibility.";
+  };
+
   // Categorize Issues
   const seoIssues = analysis.issues.filter(issue => SEO_FIELDS.includes(issue.field as keyof SEOData));
   const smoIssues = analysis.issues.filter(issue => SMO_FIELDS.includes(issue.field as keyof SEOData));
@@ -136,9 +144,9 @@ export function SEOAnalysis({ analysis, rawData }: Props) {
   const renderIssueList = (issues: SEOIssue[], categoryName: string) => {
     if (issues.length === 0) {
       return (
-        <div className="p-4 my-4 text-sm text-green-700 bg-green-50 rounded-lg flex items-center">
-          <FaCheckCircle className="w-5 h-5 mr-2 flex-shrink-0" />
-          No {categoryName.toLowerCase()} issues found.
+        <div className="p-4 my-4 text-sm text-green-700 bg-green-50 rounded-lg flex items-center gap-2 shadow-sm border border-green-200">
+          <FaCheckCircle className="w-5 h-5 flex-shrink-0" />
+          No {categoryName.toLowerCase()} issues found. Well done!
         </div>
       );
     }
@@ -151,7 +159,7 @@ export function SEOAnalysis({ analysis, rawData }: Props) {
           >
             <div className="flex items-start gap-3">
               <div className="mt-0.5">{getIssueIcon(issue.type)}</div>
-              <div className="flex-1 min-w-0"> {/* Added min-w-0 for better flex truncation */}
+              <div className="flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-1">
                   <h3 className="font-semibold text-base sm:text-lg text-gray-700 break-words mr-2">
                     {issue.message}
@@ -181,18 +189,18 @@ export function SEOAnalysis({ analysis, rawData }: Props) {
   const renderRecommendationList = (recommendations: string[], categoryName: string) => {
     if (recommendations.length === 0) {
       return (
-        <div className="p-4 my-4 text-sm text-gray-500 bg-gray-50 rounded-lg flex items-center">
-          <FaInfoCircle className="w-5 h-5 mr-2 flex-shrink-0 text-gray-400" />
-          No specific {categoryName.toLowerCase()} recommendations.
+        <div className="p-4 my-4 text-sm text-gray-500 bg-gray-50 rounded-lg flex items-center gap-2 shadow-sm border border-gray-200">
+          <FaInfoCircle className="w-5 h-5 flex-shrink-0 text-gray-400" />
+          No specific {categoryName.toLowerCase()} recommendations for now.
         </div>
       );
     }
     return (
       <div className="space-y-3 mt-4">
         {recommendations.map((recommendation, index) => (
-          <div key={`${categoryName}-rec-${index}`} className="flex items-start gap-3 bg-blue-50 p-3.5 rounded-lg border-l-4 border-blue-400 shadow-sm">
-            <FaClipboardList className="text-blue-500 mt-1 text-xl flex-shrink-0" />
-            <div className="flex-1 min-w-0"> {/* Added min-w-0 */}
+          <div key={`${categoryName}-rec-${index}`} className="flex items-start gap-3 bg-blue-50 p-3.5 rounded-lg border-l-4 border-blue-400 shadow-sm hover:shadow-md transition-shadow">
+            <FaLightbulb className="text-blue-500 mt-1 text-xl flex-shrink-0" />
+            <div className="flex-1 min-w-0">
               <p className="font-medium text-gray-700 break-words">{recommendation}</p>
               {getRecommendationDetails(recommendation)}
             </div>
@@ -204,38 +212,38 @@ export function SEOAnalysis({ analysis, rawData }: Props) {
 
   return (
     <div className="space-y-8 w-full max-w-5xl mx-auto p-2 sm:p-4 md:p-6">
-      {/* Score Section */}
-      <div className="bg-white p-5 sm:p-6 rounded-xl shadow-xl">
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 text-gray-800">Overall Analysis Summary</h2>
-        <p className="text-gray-500 mb-6 text-sm sm:text-base">{getScoreDescriptionText(analysis.score)}</p>
+      {/* Overall Summary Section */}
+      <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-xl border border-gray-200">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-gray-800">Your SEO Snapshot</h2>
+        <p className="text-gray-500 mb-6 text-sm sm:text-base">{getOverallScoreDescription(analysis.score)}</p>
         <div className="flex flex-col lg:flex-row items-center justify-around gap-6">
-          <div className="relative w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 flex-shrink-0">
+          <div className="relative w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 flex-shrink-0 group">
             <svg className="w-full h-full" viewBox="0 0 100 100">
-              <circle className="text-gray-200 stroke-current" strokeWidth="10" cx="50" cy="50" r="40" fill="transparent"></circle>
-              <circle className={`${getScoreRingColor(analysis.score)} stroke-current`} strokeWidth="10" strokeLinecap="round" cx="50" cy="50" r="40" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} transform="rotate(-90 50 50)"></circle>
-              <text x="50" y="50" fontFamily="Verdana, sans-serif" fontSize="20" fontWeight="bold" textAnchor="middle" alignmentBaseline="middle" className={getScoreColor(analysis.score)}>{analysis.score}</text>
+              <circle className="text-gray-200 stroke-current group-hover:text-gray-300 transition-colors" strokeWidth="10" cx="50" cy="50" r="40" fill="transparent"></circle>
+              <circle className={`${getScoreRingColor(analysis.score)} stroke-current group-hover:opacity-80 transition-opacity`} strokeWidth="10" strokeLinecap="round" cx="50" cy="50" r="40" fill="transparent" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} transform="rotate(-90 50 50)"></circle>
+              <text x="50" y="50" fontFamily="Verdana, sans-serif" fontSize="22" fontWeight="bold" textAnchor="middle" alignmentBaseline="middle" className={`${getScoreColor(analysis.score)} group-hover:opacity-80 transition-opacity`}>{analysis.score}</text>
             </svg>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:gap-4 text-sm w-full lg:w-auto">
-            <div className="flex items-center p-3 bg-red-50 rounded-lg shadow-sm border border-red-100">
-              <FaExclamationTriangle className="w-5 h-5 sm:w-6 sm:h-6 mr-3 text-red-500 flex-shrink-0" />
+            <div className="flex items-center p-3.5 bg-red-50 rounded-xl shadow-md border border-red-200 hover:shadow-lg transition-shadow">
+              <FaExclamationTriangle className="w-6 h-6 mr-3 text-red-500 flex-shrink-0" />
               <div className="min-w-0">
-                <div className="font-bold text-base sm:text-lg text-red-600">{totalErrors} Total Error(s)</div>
-                <div className="text-xs text-gray-500 truncate">Critical issues needing attention</div>
+                <div className="font-bold text-base sm:text-lg text-red-600">{totalErrors} Critical Issue(s)</div>
+                <div className="text-xs text-gray-500 truncate">These need your immediate attention.</div>
               </div>
             </div>
-            <div className="flex items-center p-3 bg-yellow-50 rounded-lg shadow-sm border border-yellow-100">
-              <FaExclamationCircle className="w-5 h-5 sm:w-6 sm:h-6 mr-3 text-yellow-500 flex-shrink-0" />
+            <div className="flex items-center p-3.5 bg-yellow-50 rounded-xl shadow-md border border-yellow-200 hover:shadow-lg transition-shadow">
+              <FaExclamationCircle className="w-6 h-6 mr-3 text-yellow-500 flex-shrink-0" />
               <div className="min-w-0">
-                <div className="font-bold text-base sm:text-lg text-yellow-600">{totalWarnings} Total Warning(s)</div>
-                <div className="text-xs text-gray-500 truncate">Potential issues to review</div>
+                <div className="font-bold text-base sm:text-lg text-yellow-600">{totalWarnings} Warning(s)</div>
+                <div className="text-xs text-gray-500 truncate">Consider reviewing these potential issues.</div>
               </div>
             </div>
-            <div className="flex items-center p-3 bg-blue-50 rounded-lg shadow-sm border border-blue-100">
-              <FaThumbsUp className="w-5 h-5 sm:w-6 sm:h-6 mr-3 text-blue-500 flex-shrink-0" />
+            <div className="flex items-center p-3.5 bg-blue-50 rounded-xl shadow-md border border-blue-200 hover:shadow-lg transition-shadow">
+              <FaThumbsUp className="w-6 h-6 mr-3 text-blue-500 flex-shrink-0" />
               <div className="min-w-0">
-                <div className="font-bold text-base sm:text-lg text-blue-600">{analysis.recommendations.length} Recommendation(s)</div>
-                <div className="text-xs text-gray-500 truncate">Suggestions for improvement</div>
+                <div className="font-bold text-base sm:text-lg text-blue-600">{analysis.recommendations.length} Improvement Tip(s)</div>
+                <div className="text-xs text-gray-500 truncate">Quick wins to boost your SEO.</div>
               </div>
             </div>
           </div>
@@ -243,81 +251,89 @@ export function SEOAnalysis({ analysis, rawData }: Props) {
       </div>
 
       {/* Search Engine Optimization Section */}
-      <div className="bg-white rounded-xl shadow-xl p-5 sm:p-6">
-        <div className="flex items-center mb-4 sm:mb-5">
+      <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-6 border border-gray-200">
+        <div className="flex items-center mb-5">
             <FaGoogle className="w-7 h-7 sm:w-8 sm:h-8 mr-3 text-blue-600 flex-shrink-0" />
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">Search Engine Optimization</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">Search Engine Presence</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 text-center">
-            <div className="p-3 bg-red-50 rounded-lg shadow-sm border border-red-100">
-                <FaExclamationTriangle className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 text-red-500" />
+            <div className="p-3.5 bg-red-50 rounded-xl shadow-md border border-red-200">
+                <FaExclamationTriangle className="w-6 h-6 mx-auto mb-1.5 text-red-500" />
                 <div className="text-xl sm:text-2xl font-bold text-red-600">{seoErrors}</div>
-                <div className="text-xs text-gray-500">Error(s)</div>
+                <div className="text-xs font-medium text-gray-600">Errors Found</div>
             </div>
-            <div className="p-3 bg-yellow-50 rounded-lg shadow-sm border border-yellow-100">
-                <FaExclamationCircle className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 text-yellow-500" />
+            <div className="p-3.5 bg-yellow-50 rounded-xl shadow-md border border-yellow-200">
+                <FaExclamationCircle className="w-6 h-6 mx-auto mb-1.5 text-yellow-500" />
                 <div className="text-xl sm:text-2xl font-bold text-yellow-600">{seoWarnings}</div>
-                <div className="text-xs text-gray-500">Warning(s)</div>
+                <div className="text-xs font-medium text-gray-600">Warnings</div>
             </div>
-            <div className="p-3 bg-green-50 rounded-lg shadow-sm border border-green-100">
-                <FaClipboardCheck className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 text-green-500" />
-                <div className="text-xl sm:text-2xl font-bold text-green-600">{seoPassedChecks}<span className="text-base text-gray-500">/{SEO_FIELDS.length}</span></div>
-                <div className="text-xs text-gray-500">Checks Passed</div>
+            <div className="p-3.5 bg-green-50 rounded-xl shadow-md border border-green-200">
+                <FaClipboardCheck className="w-6 h-6 mx-auto mb-1.5 text-green-500" />
+                <div className="text-xl sm:text-2xl font-bold text-green-600">{seoPassedChecks}</div>
+                <div className="text-xs font-medium text-gray-600">Optimized Items</div>
             </div>
         </div>
         <div>
-            <h3 className="text-md sm:text-lg font-semibold text-gray-700 mt-4 pt-3 border-t border-gray-200">Identified SEO Issues</h3>
+            <h3 className="text-md sm:text-lg font-semibold text-gray-700 mt-5 pt-4 border-t border-gray-200 flex items-center gap-2">
+                <FaBug className="text-gray-500"/> SEO: Areas to Improve
+            </h3>
             {renderIssueList(seoIssues, "SEO")}
         </div>
         {seoRecommendations.length > 0 && (
-          <div className="mt-5 sm:mt-6">
-              <h3 className="text-md sm:text-lg font-semibold text-gray-700 pt-3 border-t border-gray-200">SEO Recommendations</h3>
+          <div className="mt-6">
+              <h3 className="text-md sm:text-lg font-semibold text-gray-700 pt-4 border-t border-gray-200 flex items-center gap-2">
+                <FaLightbulb className="text-yellow-400" /> SEO: Quick Wins & Tips
+              </h3>
               {renderRecommendationList(seoRecommendations, "SEO")}
           </div>
         )}
       </div>
 
       {/* Social Media Optimization Section */}
-      <div className="bg-white rounded-xl shadow-xl p-5 sm:p-6">
-         <div className="flex items-center mb-4 sm:mb-5">
+      <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-6 border border-gray-200">
+         <div className="flex items-center mb-5">
             <FaShareSquare className="w-7 h-7 sm:w-8 sm:h-8 mr-3 text-purple-600 flex-shrink-0" />
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">Social Media Optimization</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">Social Media Visibility</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 text-center">
-            <div className="p-3 bg-red-50 rounded-lg shadow-sm border border-red-100">
-                <FaExclamationTriangle className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 text-red-500" />
+            <div className="p-3.5 bg-red-50 rounded-xl shadow-md border border-red-200">
+                <FaExclamationTriangle className="w-6 h-6 mx-auto mb-1.5 text-red-500" />
                 <div className="text-xl sm:text-2xl font-bold text-red-600">{smoErrors}</div>
-                <div className="text-xs text-gray-500">Error(s)</div>
+                <div className="text-xs font-medium text-gray-600">Errors Found</div>
             </div>
-            <div className="p-3 bg-yellow-50 rounded-lg shadow-sm border border-yellow-100">
-                <FaExclamationCircle className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 text-yellow-500" />
+            <div className="p-3.5 bg-yellow-50 rounded-xl shadow-md border border-yellow-200">
+                <FaExclamationCircle className="w-6 h-6 mx-auto mb-1.5 text-yellow-500" />
                 <div className="text-xl sm:text-2xl font-bold text-yellow-600">{smoWarnings}</div>
-                <div className="text-xs text-gray-500">Warning(s)</div>
+                <div className="text-xs font-medium text-gray-600">Warnings</div>
             </div>
-            <div className="p-3 bg-green-50 rounded-lg shadow-sm border border-green-100">
-                <FaClipboardCheck className="w-5 h-5 sm:w-6 sm:h-6 mx-auto mb-1 text-green-500" />
-                <div className="text-xl sm:text-2xl font-bold text-green-600">{smoPassedChecks}<span className="text-base text-gray-500">/{SMO_FIELDS.length}</span></div>
-                <div className="text-xs text-gray-500">Checks Passed</div>
+            <div className="p-3.5 bg-green-50 rounded-xl shadow-md border border-green-200">
+                <FaClipboardCheck className="w-6 h-6 mx-auto mb-1.5 text-green-500" />
+                <div className="text-xl sm:text-2xl font-bold text-green-600">{smoPassedChecks}</div>
+                <div className="text-xs font-medium text-gray-600">Optimized Items</div>
             </div>
         </div>
         <div>
-            <h3 className="text-md sm:text-lg font-semibold text-gray-700 mt-4 pt-3 border-t border-gray-200">Identified SMO Issues</h3>
+            <h3 className="text-md sm:text-lg font-semibold text-gray-700 mt-5 pt-4 border-t border-gray-200 flex items-center gap-2">
+                <FaBug className="text-gray-500"/> SMO: Areas to Improve
+            </h3>
             {renderIssueList(smoIssues, "SMO")}
         </div>
         {smoRecommendations.length > 0 && (
-          <div className="mt-5 sm:mt-6">
-              <h3 className="text-md sm:text-lg font-semibold text-gray-700 pt-3 border-t border-gray-200">SMO Recommendations</h3>
+          <div className="mt-6">
+              <h3 className="text-md sm:text-lg font-semibold text-gray-700 pt-4 border-t border-gray-200 flex items-center gap-2">
+                <FaLightbulb className="text-yellow-400" /> SMO: Quick Wins & Tips
+              </h3>
               {renderRecommendationList(smoRecommendations, "Social Media")}
           </div>
         )}
       </div>
 
       {analysis.issues.length === 0 && analysis.recommendations.length === 0 && (
-         <div className="bg-green-50 p-6 rounded-xl shadow-lg flex items-center gap-4 border border-green-200">
+         <div className="bg-green-50 p-6 rounded-2xl shadow-lg flex items-center gap-4 border border-green-200">
             <FaCheckCircle className="text-green-500 text-3xl flex-shrink-0" />
             <div className="min-w-0">
-                <h2 className="text-xl font-bold text-green-700">All Clear!</h2>
-                <p className="text-green-600">No SEO or SMO issues found. Your website looks great!</p>
+                <h2 className="text-xl font-bold text-green-700">Fantastic! All Clear!</h2>
+                <p className="text-green-600">No critical SEO or Social Media issues found. Your website is looking great!</p>
             </div>
         </div>
       )}
